@@ -41,8 +41,7 @@ class Mysql {
             $txt = "PDO connection failure: " . $e->getMessage();
             error_log( $txt );
             http_response_code(500);
-            die( $txt );
-                        
+            throw $e;                        
         }
     }
 
@@ -51,12 +50,28 @@ class Mysql {
     }
 
 
+    /**
+     * Ejecuta la SQL tipo INSERT/UPDATE/DELETE/REPLACE 
+     * agregandole los 4 campos "DPS" ( ins_usuario, ins_horario, act_usuario, act_horario )
+     * @throws MysqlException If there is an error 
+     * @param mixed $query
+     * @param mixed $params
+     * @return bool|int
+     */
     function ejecutarIns($query, $params = false  ) {
         $query = $this->stringIns( $query );
 
         return $this->ejecutar($query, $params);
     }
 
+    /**
+     * Ejecuta la SQL tipo INSERT/UPDATE/DELETE/REPLACE 
+     * agregandole los 2 campos "DPS" ( act_usuario, act_horario )     * 
+     * @param mixed $query
+     * @param mixed $params
+     * @throws MysqlException If there is an error 
+     * @return bool|int
+     */
 
     function ejecutarAct($query, $params = false  ) {
         $query = $this->stringAct( $query );
@@ -72,7 +87,6 @@ class Mysql {
     function logE( $txt ) {
         $txt = "[SQLERR] $txt";
         error_log( $txt );
-
     }
     
 
@@ -142,6 +156,7 @@ class Mysql {
      *
      * @param string $query La consulta SQL a ejecutar.
      * @param mixed $params (opcional) Los parámetros a enlazar a la consulta. [['s', $valor1], ['i', $valor2], ...]
+     * @throws MysqlException If there is an error 
      * @return int|false El número de filas afectadas o el número de filas devueltas, o false si la consulta falló.
      */
     function ejecutar( $query, $params = false )
@@ -193,7 +208,7 @@ class Mysql {
     }
 
     
-    function stringIns( $sql )
+    private function stringIns( $sql )
     {
         $sql = trim($sql);
 
@@ -209,7 +224,7 @@ class Mysql {
     }
 
 
-    function stringAct( $sql )
+    private function stringAct( $sql )
     {
         if( ( $p = strpos(strtolower($sql),"where") ) > 0 )
         {
@@ -230,7 +245,7 @@ class Mysql {
     }
 
     /**
-     * Ejecuta una consulta SQL y devuelve los resultados como arrays asociativos.
+     * Ejecuta una consulta SQL y devuelve los resultados como array asociativo.
      *
      * @param string $sql La consulta SQL a ejecutar.
      * @param mixed $params (opcional) Los parámetros a enlazar a la consulta SQL.
@@ -261,6 +276,7 @@ class Mysql {
      *
      * @param string $sql La consulta SQL a ejecutar.
      * @param mixed $params (opcional) Los parámetros a enlazar a la consulta SQL.
+     * @throws MysqlException If there is an error 
      * @return mixed Los resultados de la consulta SQL, o false si no se pudo ejecutar la consulta.
      */
     function resultadoAssoc( $sql, $params = false ) 
@@ -296,6 +312,7 @@ class Mysql {
      *
      * @param string $sql La consulta SQL a ejecutar.
      * @param mixed $params (opcional) Los parámetros a enlazar a la consulta SQL.
+     * @throws MysqlException If there is an error 
      * @return mixed Los resultados de la consulta SQL, o false si no se pudo ejecutar la consulta.
      */
     function resultadoNumerico( $sql, $params = false ) 
@@ -309,6 +326,7 @@ class Mysql {
      * @param string $sql La consulta SQL a ejecutar deberia tener 2 campos ( id y descripcion ).
      * @param mixed $params (opcional) Los parámetros a enlazar a la consulta SQL.
      * @param string $titulo (opcional) El valor predeterminado a mostrarse en el combo.
+     * @throws MysqlException If there is an error 
      * @return array Un array de opciones generado a partir de la consulta SQL.
      */
     function arrayParaSelect( $sql = "", $params = false, $titulo = "-- Seleccione --" )
@@ -332,7 +350,14 @@ class Mysql {
     }
 
 
-  function arrayParaSelectOriginal( $sql = "", $titulo = "-- Seleccione --" )
+    /**
+     * La version original de @arrayParaSelect que devuelve la info con otro formato
+     * @param mixed $sql
+     * @param mixed $titulo
+     * @throws MysqlException If there is an error 
+     * @return array
+     */
+    function arrayParaSelectOriginal( $sql = "", $titulo = "-- Seleccione --" )
     {
         $opciones['ninguno'] = $titulo;
 
@@ -352,7 +377,7 @@ class Mysql {
     }    
 
 	
-    function tratarError( $params, $f_deshabOnDuplicate = true )
+    private function tratarError( $params, $f_deshabOnDuplicate = true )
     {
         // En caso de no poder eliminar el registro por tener CONSTRAINTS asociados
         // Automaticamente deshabilitamos el registro
@@ -385,6 +410,7 @@ class Mysql {
      * @param string $sql La consulta SQL a ejecutar.
      * @param mixed $campo (opcional) El nombre del campo a obtener. Si no se proporciona, se devuelve la primera fila completa.
      * @param array $params (opcional) Los parámetros a enlazar a la consulta SQL.
+     * @throws MysqlException If there is an error 
      * @return mixed El valor del campo solicitado o la primera fila completa, o false si no se encontraron filas.
      */
     function campos( string $sql, $campo = false, $params = false  ) {
@@ -514,14 +540,17 @@ class Mysql {
         }
     }
 
-
+    /**
+     * Devuelve el ID de la ultima insercion con AUTO_INCREMENT
+     * @return mixed
+     */
     function lastID() {
         $sql = "SELECT LAST_INSERT_ID() AS lastID";
         return $this->campos($sql, 'lastID');
     }
 
 
-    function sql2array( $sql, $statement = false )
+    private function sql2array( $sql, $statement = false )
     {
         $sql = trim( $sql );
     

@@ -11,8 +11,6 @@ Como es un repositorio privado, para agregar esta libreria en un sistema hay que
     "dps/mysql": "*"
     ...
   },
-  "minimum-stability": "dev",
-  "prefer-stable" : true,    
   "repositories": [
   {
       "type": "vcs",
