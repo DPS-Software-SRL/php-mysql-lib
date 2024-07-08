@@ -2,7 +2,7 @@
 
 namespace Dps;
 
-use MysqlExcep, PDO, PDOException;
+use Dps\MysqlExcep, PDO, PDOException;
 
 
 class Mysql {
