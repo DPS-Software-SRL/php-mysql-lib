@@ -1,0 +1,8 @@
+{
+    "name": "dps/mysql",
+    "autoload": {
+        "psr-4": {
+            "Dps\\": "src/"
+        }
+    }
+}
