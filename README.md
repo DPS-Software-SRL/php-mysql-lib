@@ -8,13 +8,13 @@ Como es un repositorio privado, para agregar esta libreria en un sistema hay que
 {
   "require" : {
     ...
-    "dps/mysql": "*"
+    "dps-software-srl/php-mysql-lib": "*"
     ...
   },
   "repositories": [
   {
       "type": "vcs",
-      "url": "git@github.com:marcoas/mysql.git"
+      "url": "git@github.com:dps-software-srl/php-mysql-lib.git"
     }
   ],      
 }
