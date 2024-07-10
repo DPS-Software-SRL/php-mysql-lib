@@ -2,23 +2,24 @@
 
 namespace Dps;
 
-use Dps\MysqlExcep, PDO, PDOException;
+use Dps\MysqlException, PDO, PDOException;
 
 
 class Mysql {
-    var $pdo;
-    var $stmt;
-    var $enTransaction          = false;
-    var $problemasEnTransaccion = false;
-    var $logDeConsultas         = false;
-    var $ultimaQuery;  // String de la ultima query ejecutada;
-    var $isPrep                 = false;
-    var $paramsTypes = [
+    private $enTransaction          = false;
+    private $isPrep                 = false;
+    public  $logDeConsultas         = false;
+    private $paramsTypes = [
         'b' => PDO::PARAM_BOOL,
         'n' => PDO::PARAM_NULL,
         'i' => PDO::PARAM_INT,
         's' => PDO::PARAM_STR,
     ];
+    private $pdo;
+    private $problemasEnTransaccion = false;
+    private $stmt;
+    private $ultimaQuery;  // String de la ultima query ejecutada;
+    private $usuario = '';
 
     /**
      * Constructor for the MySQL.
@@ -36,6 +37,8 @@ class Mysql {
             $this->pdo = new PDO("mysql:host={$sqlserver};port={$port};dbname={$database}", $sqluser, $sqlpassword);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+
+            $this->setUsuario( $_SESSION['UsuarioConectado'] ?? 'DPS' );
 
         } catch (PDOException $e) {
             $txt = "PDO connection failure: " . $e->getMessage();
@@ -220,7 +223,7 @@ class Mysql {
         if( substr($sql, -1, 1) != ',' )
             $sql .= ",";
 
-        return $sql .= " '{$_SESSION['UsuarioConectado']}', NOW(), '{$_SESSION['UsuarioConectado']}', NOW() ) ";
+        return $sql .= " '{$this->usuario}', NOW(), '{$this->usuario}', NOW() ) ";
     }
 
 
@@ -238,7 +241,7 @@ class Mysql {
         if( substr($sql, -1, 1) != ',' )
             $sql .= ",";
 
-        $sql .= " act_usuario = '{$_SESSION['UsuarioConectado']}', act_horario = NOW() ";
+        $sql .= " act_usuario = '{$this->usuario}', act_horario = NOW() ";
         $sql .= $where;
 
         return $sql;
@@ -399,7 +402,7 @@ class Mysql {
         $txt = "{$_SERVER['PHP_SELF']} [$ultimoErrno]  $ultimoError\n$this->ultimaQuery";
         $this->logE( $txt );
 
-        throw new MysqlExcep( $ultimoError, $ultimoErrno );
+        throw new MysqlException( $ultimoError, $ultimoErrno );
 
     }
 
@@ -584,6 +587,16 @@ class Mysql {
         else
             return $result[$statement];
     
+    }
+
+    public function getUsuario()
+    {
+        return $this->usuario;
+    }
+
+    public function setUsuario( string $user )
+    {
+        $this->usuario = $user;
     }
     
 }
