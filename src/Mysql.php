@@ -396,6 +396,10 @@ class Mysql {
         if( $ultimoErrno == 1451 && $f_deshabOnDuplicate ) {
           $partes = $this->sql2array( $this->ultimaQuery );
           $nuevaSQL = "UPDATE " . $partes['from'] . " SET f_deshab = '1' WHERE " . $partes['where'];
+
+	  // trampa para que este UPDATE se puede ejecutar sin problemas
+          $this->problemasEnTransaccion = false;
+		
           return $this->ejecutar( $nuevaSQL, $params );
         }
 
