@@ -262,8 +262,13 @@ class Mysql {
             
             // Las SQL de un solo campo son tratadas diferentes para mantener retrocompatibilidad
             if( $this->stmt->columnCount() ===  1) {                
-                $fieldName = $this->stmt->getColumnMeta(0)['name'];
-                $salida = array_column($salida, $fieldName);
+                if( $tipo == PDO::FETCH_ASSOC ) {
+                    $columna = $this->stmt->getColumnMeta(0)['name'];
+
+                } else if ($tipo == PDO::FETCH_NUM) {
+                    $columna = 0;
+                }
+                $salida = array_column($salida, $columna );
             }
 
             return $salida;
