@@ -229,6 +229,7 @@ class Mysql {
 
     private function stringAct( $sql )
     {
+        $where = '';
         if( ( $p = strpos(strtolower($sql),"where") ) > 0 )
         {
             $where = substr($sql, $p );
