@@ -1,6 +1,7 @@
 {
     "name": "dps-software-srl/php-mysql-lib",
-    "minimum-stability": "stable",
+    "description": "Mysql access with PDO",
+    "license": "proprietary",        
     "autoload": {
         "psr-4": {
             "Dps\\": "src/"
