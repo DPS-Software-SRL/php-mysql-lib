@@ -1,5 +1,6 @@
 {
     "name": "dps-software-srl/php-mysql-lib",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "Dps\\": "src/"
