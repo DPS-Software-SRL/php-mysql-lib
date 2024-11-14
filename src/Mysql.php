@@ -399,14 +399,29 @@ class Mysql {
 
         }
 
+        $tmpSQL = $this->ultimaQuery;
+
+        $this->ultimaQuery = $tmpSQL;
+
         if( $ultimoErrno == 1451 && $f_deshabOnDuplicate ) {
           $partes = $this->sql2array( $this->ultimaQuery );
-          $nuevaSQL = "UPDATE " . $partes['from'] . " SET f_deshab = '1' WHERE " . $partes['where'];
+        
+            // buscar si existe el campo f_deshab en la tabla
+            $sql2 = "SELECT COLUMN_NAME 
+                       FROM INFORMATION_SCHEMA.COLUMNS 
+                      WHERE TABLE_SCHEMA = DATABASE() 
+                        AND TABLE_NAME = '{$partes['from']}' 
+                        AND COLUMN_NAME = 'f_deshab'" ;
+            $tiene_f_deshab = $this->campos( $sql2, 'COLUMN_NAME' );
+
+            if( $tiene_f_deshab ) {
+                $nuevaSQL = "UPDATE {$partes['from']} SET f_deshab = '1' WHERE {$partes['where']}";
 
 	  // trampa para que este UPDATE se puede ejecutar sin problemas
           $this->problemasEnTransaccion = false;
 		
           return $this->ejecutar( $nuevaSQL, $params );
+            }
         }
 
         $txt = "{$_SERVER['PHP_SELF']} [$ultimoErrno]  $ultimoError\n$this->ultimaQuery";
