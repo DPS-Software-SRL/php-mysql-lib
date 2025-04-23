@@ -16,7 +16,7 @@ class MysqlMessages {
      * @param int $nro
      * @return bool|string
      */
-    static public function getMsg( int $nro ) {
+    static public function getMsg( int|null $nro ) {
         if( empty(self::$msg) ) {            
             self::$msg = self::setMessages();        
         }
