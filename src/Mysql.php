@@ -329,27 +329,41 @@ class Mysql {
         return $this->resultado( $sql, $params, PDO::FETCH_NUM );
     }
 
+
     /**
      * Genera un array especial para usarse en un combo ( select ) de FORMY
      *
-     * @param string $sql La consulta SQL a ejecutar deberia tener 2 campos ( id y descripcion ).
+     * @param string $sql La consulta SQL a ejecutar deberia tener al menos 2 campos ( se usaran como id y descripcion del combo).
+     *                    Hay 3 campos opcionales en la SQL para hacer llegar al COMBO de autocopletar: 'clase', 'extra' y 'rel'
+     *                    Extra es una porcion de html que aparecera en la opcion del combo
+     *                    Clase es una clase que se usara para dar estilos a esa opcion del combo
+     *                        Hay 2 clases con uso particular: itemElementTopItem y itemElementSubItem
+     *                        Sirven para indicar agrupaciones en el combo
+     *                    Rel es el id de la opcion padre para usar con las relaciones
+     *             
      * @param mixed $params (opcional) Los parámetros a enlazar a la consulta SQL.
      * @param string $titulo (opcional) El valor predeterminado a mostrarse en el combo.
      * @throws MysqlException If there is an error 
      * @return array Un array de opciones generado a partir de la consulta SQL.
      */
     function arrayParaSelect( $sql = "", $params = false, $titulo = "-- Seleccione --" )
-    {
-        // $opciones['ninguno'] = $titulo;
-
-        $arraySelect = $this->resultadoNumerico( $sql, $params );
+    {        
+        $arraySelect = $this->resultado( $sql, $params );
 
         if( is_array($arraySelect) )
         {
-          foreach( $arraySelect as $array )
-             //$opciones[$array[0]] = $array[1];
-             $opciones[] = [ 'id' => $array[0], 'txt' => $array[1] ];
+          foreach( $arraySelect as $array ) {
+             $v   = array_values($array);
 
+             $opcion = [];
+             $opcion['id']  = $v[0];
+             $opcion['txt'] = $v[1];
+             if( array_key_exists( 'clase', $array ) ) $opcion['clase'] = $array['clase'];
+             if( array_key_exists( 'extra', $array ) ) $opcion['extra'] = $array['extra'];
+             if( array_key_exists( 'rel', $array ) )   $opcion['rel']   = $array['rel'];
+
+             $opciones[] = $opcion;
+          }
           return $opciones;
 
         } else {
@@ -357,6 +371,7 @@ class Mysql {
 
         }
     }
+
 
 
     /**
