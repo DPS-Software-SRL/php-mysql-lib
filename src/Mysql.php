@@ -248,6 +248,18 @@ class Mysql {
         return $sql;
     }
 
+	
+    /**
+     * Devuelve un registro del Statement.
+     * Util para recorrer un largo set de datos sin consumir memoria
+     * @param mixed $tipo
+     */
+    public function fetch( $tipo = PDO::FETCH_ASSOC ) 
+    {
+        return $this->stmt->fetch( $tipo );
+    }
+
+	
     /**
      * Ejecuta una consulta SQL y devuelve los resultados como array asociativo.
      *
