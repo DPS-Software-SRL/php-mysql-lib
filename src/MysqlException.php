@@ -12,7 +12,7 @@ class MysqlException extends Exception {
         parent::__construct($texto, $nro);
         $this->MysqlError = $texto;
         $this->MysqlNro   = $nro;
-        error_log("MysqlException: $nro - $texto"); 
-        
+        // error_log("MysqlException: $nro - $texto"); 
+        trigger_error("MysqlException: $nro - $texto", E_USER_ERROR);
     }
 }
