@@ -3,7 +3,7 @@
     "description": "Mysql access with PDO",
     "license": "proprietary",        
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.4"
     },    
     "autoload": {
         "psr-4": {

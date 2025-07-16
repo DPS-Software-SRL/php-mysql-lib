@@ -4,7 +4,6 @@ namespace Dps;
 
 use Dps\MysqlException, PDO, PDOException;
 
-
 class Mysql {
     private $enTransaction          = false;
     private $isPrep                 = false;
@@ -21,6 +20,9 @@ class Mysql {
     private $ultimaQuery;  // String de la ultima query ejecutada;
     private $usuario = '';
 
+    private static ?Mysql $instance = null;
+
+
     /**
      * Constructor for the MySQL.
      *
@@ -33,6 +35,7 @@ class Mysql {
      * @return void
      */
     function __construct($sqlserver, $sqluser, $sqlpassword, $database, $port = 3306) {
+        
         try {
             $this->pdo = new PDO("mysql:host={$sqlserver};port={$port};dbname={$database}", $sqluser, $sqlpassword);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -47,6 +50,15 @@ class Mysql {
             throw $e;                        
         }
     }
+
+    public static function get( $sqlserver, $sqluser, $sqlpassword, $database, $port ): Mysql
+    {
+        if (!self::$instance) {
+            self::$instance = new self($sqlserver, $sqluser, $sqlpassword, $database, $port);
+        }
+        return self::$instance;
+    }
+
 
     function __destruct() {
         $this->pdo = null;
