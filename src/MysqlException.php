@@ -13,6 +13,6 @@ class MysqlException extends Exception {
         $this->MysqlError = $texto;
         $this->MysqlNro   = $nro;
         // error_log("MysqlException: $nro - $texto"); 
-        trigger_error("MysqlException: $nro - $texto", E_USER_ERROR);
+        // trigger_error("MysqlException: $nro - $texto", E_USER_ERROR);
     }
 }
