@@ -8,7 +8,7 @@ class MysqlException extends Exception {
     var $MysqlError;
     var $MysqlNro;
 
-    public function __construct($texto, $nro = 0, Exception $previous = null) {
+    public function __construct($texto, $nro = 0, ?Throwable $previous = null) {
         parent::__construct($texto, $nro);
         $this->MysqlError = $texto;
         $this->MysqlNro   = $nro;
