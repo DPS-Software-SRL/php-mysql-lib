@@ -38,8 +38,10 @@ class Mysql {
         
         try {
             $this->pdo = new PDO("mysql:host={$sqlserver};port={$port};dbname={$database}", $sqluser, $sqlpassword);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+             $this->setPDOOptions([
+                PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_EMULATE_PREPARES  => true,
+            ]);
 
             $this->setUsuario( $_SESSION['UsuarioConectado'] ?? 'DPS' );
 
@@ -64,7 +66,29 @@ class Mysql {
         $this->pdo = null;
     }
 
+    /**
+     * Setea un atributo de la conexion PDO
+     * @param int $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setPDOOption( int $key, mixed $value ) {
+        $this->pdo->setAttribute($key, $value);
+    }
 
+
+    /**
+     * Setea varios atributos de la conexion PDO
+     * @param array $options
+     * @return void
+     */
+    public function setPDOOptions( array $options ) {
+        foreach ($options as $key => $value) {
+            $this->setPDOOption( $key, $value );
+        }
+    }
+
+	
     /**
      * Ejecuta la SQL tipo INSERT/UPDATE/DELETE/REPLACE 
      * agregandole los 4 campos "DPS" ( ins_usuario, ins_horario, act_usuario, act_horario )
