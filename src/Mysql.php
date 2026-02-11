@@ -686,5 +686,46 @@ class Mysql {
     {
         $this->usuario = $user;
     }
+
     
+    /**
+     * INSERT multiple con prepared statement
+     * @param string $sql 'INSERT INTO _tabla_ ( ... ) VALUES "  DEBE TERMINAR EN VALUES !!!!!
+     * @param array $datos array con los registros a grabar. Ej: [ ['valor1', 'valor2'], ['valor3', 'valor4'] ]
+     * @return int|bool
+     */
+    public function insertMultiplePreparado( string $sql, array $datos ) : int|bool{
+        // controlar que $sql termine en VALUES
+        if( strtoupper( substr( trim($sql), -6 ) ) != 'VALUES' ) {
+            throw new \Exception("El SQL de insertMultiplePreparado debe terminar en VALUES", 1);
+            return false;
+        }
+
+        $columnasPorRegistro = count($datos[0]);
+        $cantidadRegistros   = count($datos);
+        $placeholderFila     = '(' . implode(',', array_fill(0, $columnasPorRegistro, '?')) . ')';
+        $placeholders        = implode( ',', array_fill(0, $cantidadRegistros, $placeholderFila) );
+        $sql                .= " $placeholders"; 
+        $status              = false;
+
+        try {
+            $this->stmt = $this->pdo->prepare($sql);
+            $status = $this->stmt->execute( array_merge(...$datos ));
+
+        } catch (PDOException $e) {
+            $this->logE( $e->getMessage() . " con $sql");
+            // $this->logE("Parametros: ". print_r($params, 1));
+        }
+
+        if( $status ) {
+            return $this->stmt->rowCount(); // Devuelve num_rows o affected_rows
+
+        } else {
+
+            $this->problemasEnTransaccion = true;
+            $this->tratarError( [] );
+            return false;
+        }
+    }
+
 }
