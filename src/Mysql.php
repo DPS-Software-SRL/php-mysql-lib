@@ -728,4 +728,23 @@ class Mysql {
         }
     }
 
+	
+    /**
+     * Devuelve el objeto interno PDO
+     * @return PDO
+     */
+    public function getPDO()
+    {
+        return $this->pdo;
+    }
+
+
+    /**
+     * Devuelve el objeto interno PDO->STMT
+     */
+    public function getSTMT()
+    {
+        return $this->stmt;
+    }
+
 }
